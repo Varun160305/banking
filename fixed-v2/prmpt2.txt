@@ -1,0 +1,112 @@
+I have a Spring Boot banking application with a Scheduled Payment module. The current implementation uses primitive fields (customerId, fromAccountId) and basic logic.
+
+I want to refactor this module to production-level standards with proper relationships, security, and validation.
+
+Please provide FULL updated code for:
+1. Entity
+2. Repository
+3. Service Implementation
+4. Controller
+5. DTO changes if needed
+
+✅ REQUIREMENTS:
+
+1. ✅ Convert customerId to foreign key relationship:
+   Replace:
+   private Integer customerId;
+
+   With:
+   @ManyToOne
+   @JoinColumn(name = "customer_id", nullable = false)
+   private User customer;
+
+2. ✅ Convert fromAccountId to foreign key:
+   Replace:
+   private Integer fromAccountId;
+
+   With:
+   @ManyToOne
+   @JoinColumn(name = "from_account_id", nullable = false)
+   private BankAccount fromAccount;
+
+3. ✅ Keep Beneficiary as @ManyToOne (already exists)
+
+4. ✅ Update unique constraint:
+   Use column names:
+   { "customer_id", "from_account_id", "beneficiary_id", "frequency" }
+
+5. ✅ Update Repository methods:
+   Replace:
+   findByCustomerId(Integer customerId)
+
+   With:
+   findByCustomer(User customer)
+
+6. ✅ Update Service layer:
+
+   - Extract logged-in user using SecurityContextHolder
+   - Fetch User from userRepo
+   - Fetch BankAccount using accountRepo
+   - Validate ownership:
+     Ensure fromAccount belongs to logged-in user
+
+   - Replace:
+     e.setCustomerId()
+     e.setFromAccountId()
+
+   With:
+     e.setCustomer(user)
+     e.setFromAccount(account)
+
+   - Validate:
+     amount > 0
+     nextRunDate must be today or future
+     beneficiary must not be null
+
+7. ✅ Add Security Checks:
+
+   - User can ONLY manage their own schedules
+   - Prevent access to other users' schedules
+
+8. ✅ Improve DTO mapping:
+
+   - Convert:
+     dto.customerId = entity.customer.userId
+     dto.fromAccountId = entity.fromAccount.accountId
+     dto.beneficiaryId = entity.beneficiary.beneficiaryId
+
+   - Do NOT expose full entities in API
+
+9. ✅ Add proper exception handling:
+
+   - Use .orElseThrow() instead of .orElse(null)
+   - Provide meaningful error messages
+   - Avoid NullPointerException
+
+10. ✅ Improve Controller:
+
+   - Add try-catch blocks
+   - Return correct status codes:
+     200 OK
+     201 CREATED
+     400 BAD REQUEST
+     404 NOT FOUND
+
+   - Replace customerId request param with logged-in user (best practice)
+   - Optionally add endpoint: GET /api/scheduled-payments/my
+
+11. ✅ Add logging:
+
+   Use log.info() for create, pause, cancel actions
+
+12. ✅ Optional (Advanced):
+
+   - Add cron-based execution logic for scheduled payments
+   - Fetch due payments where nextRunDate <= today
+   - Mark execution success and update nextRunDate based on frequency
+
+✅ OUTPUT REQUIRED:
+
+- Full updated code (Entity, Repository, Service, Controller, DTO)
+- Clean, readable, production-ready
+- Follow Spring Boot + JPA + Security best practices
