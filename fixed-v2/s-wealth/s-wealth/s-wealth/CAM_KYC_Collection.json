@@ -1,0 +1,129 @@
+{
+	"info": {
+		"name": "WealthWise - Customer Account + KYC/AML (CAM)",
+		"description": "Modules 4.2 + 4.6 — Bank Accounts, Statements, KYC, AML. Set {{baseUrl}} and {{token}} (from POST /api/auth/login; admin works for all). Lifecycle: open account -> submit KYC -> verify -> raise AML flag -> investigate.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"variable": [
+		{ "key": "baseUrl", "value": "http://localhost:8098" },
+		{ "key": "token", "value": "" }
+	],
+	"item": [
+		{
+			"name": "Auth - Login (admin)",
+			"request": {
+				"method": "POST",
+				"header": [ { "key": "Content-Type", "value": "application/json" } ],
+				"url": { "raw": "{{baseUrl}}/api/auth/login", "host": [ "{{baseUrl}}" ], "path": [ "api", "auth", "login" ] },
+				"body": { "mode": "raw", "raw": "{\n  \"email\": \"admin@bank.com\",\n  \"password\": \"admin123\"\n}" }
+			}
+		},
+		{
+			"name": "Bank Accounts",
+			"item": [
+				{
+					"name": "POST open account (201)",
+					"request": {
+						"method": "POST",
+						"header": [ { "key": "Content-Type", "value": "application/json" }, { "key": "Authorization", "value": "Bearer {{token}}" } ],
+						"url": { "raw": "{{baseUrl}}/api/bank-accounts", "host": [ "{{baseUrl}}" ], "path": [ "api", "bank-accounts" ] },
+						"body": { "mode": "raw", "raw": "{\n  \"customerId\": 101,\n  \"accountType\": \"Savings\",\n  \"accountNumber\": \"SB5000500005\",\n  \"balance\": 10000,\n  \"interestRate\": 3.5\n}" }
+					}
+				},
+				{
+					"name": "GET ?customerId=101",
+					"request": { "method": "GET", "header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ], "url": { "raw": "{{baseUrl}}/api/bank-accounts?customerId=101", "host": [ "{{baseUrl}}" ], "path": [ "api", "bank-accounts" ], "query": [ { "key": "customerId", "value": "101" } ] } }
+				},
+				{
+					"name": "GET /{id} (200/404)",
+					"request": { "method": "GET", "header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ], "url": { "raw": "{{baseUrl}}/api/bank-accounts/1", "host": [ "{{baseUrl}}" ], "path": [ "api", "bank-accounts", "1" ] } }
+				},
+				{
+					"name": "GET /number/{accountNumber}",
+					"request": { "method": "GET", "header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ], "url": { "raw": "{{baseUrl}}/api/bank-accounts/number/SB1000100001", "host": [ "{{baseUrl}}" ], "path": [ "api", "bank-accounts", "number", "SB1000100001" ] } }
+				},
+				{
+					"name": "PATCH /{id}/close",
+					"request": { "method": "PATCH", "header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ], "url": { "raw": "{{baseUrl}}/api/bank-accounts/1/close", "host": [ "{{baseUrl}}" ], "path": [ "api", "bank-accounts", "1", "close" ] } }
+				}
+			]
+		},
+		{
+			"name": "Account Statements",
+			"item": [
+				{
+					"name": "POST generate ?accountId=&from=&to= (201)",
+					"request": {
+						"method": "POST",
+						"header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ],
+						"url": { "raw": "{{baseUrl}}/api/account-statements?accountId=1&from=2025-06-01&to=2025-06-30", "host": [ "{{baseUrl}}" ], "path": [ "api", "account-statements" ], "query": [ { "key": "accountId", "value": "1" }, { "key": "from", "value": "2025-06-01" }, { "key": "to", "value": "2025-06-30" } ] }
+					}
+				},
+				{
+					"name": "GET ?accountId=1",
+					"request": { "method": "GET", "header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ], "url": { "raw": "{{baseUrl}}/api/account-statements?accountId=1", "host": [ "{{baseUrl}}" ], "path": [ "api", "account-statements" ], "query": [ { "key": "accountId", "value": "1" } ] } }
+				}
+			]
+		},
+		{
+			"name": "KYC Records",
+			"item": [
+				{
+					"name": "POST submit KYC (201)",
+					"request": {
+						"method": "POST",
+						"header": [ { "key": "Content-Type", "value": "application/json" }, { "key": "Authorization", "value": "Bearer {{token}}" } ],
+						"url": { "raw": "{{baseUrl}}/api/kyc-records", "host": [ "{{baseUrl}}" ], "path": [ "api", "kyc-records" ] },
+						"body": { "mode": "raw", "raw": "{\n  \"customerId\": 103,\n  \"documentType\": \"DrivingLicense\",\n  \"documentNumber\": \"DL55667788\"\n}" }
+					}
+				},
+				{
+					"name": "GET ?customerId=101",
+					"request": { "method": "GET", "header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ], "url": { "raw": "{{baseUrl}}/api/kyc-records?customerId=101", "host": [ "{{baseUrl}}" ], "path": [ "api", "kyc-records" ], "query": [ { "key": "customerId", "value": "101" } ] } }
+				},
+				{
+					"name": "GET /{id}",
+					"request": { "method": "GET", "header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ], "url": { "raw": "{{baseUrl}}/api/kyc-records/2", "host": [ "{{baseUrl}}" ], "path": [ "api", "kyc-records", "2" ] } }
+				},
+				{
+					"name": "PATCH /{id}/verify?verifiedBy=6",
+					"request": { "method": "PATCH", "header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ], "url": { "raw": "{{baseUrl}}/api/kyc-records/2/verify?verifiedBy=6", "host": [ "{{baseUrl}}" ], "path": [ "api", "kyc-records", "2", "verify" ], "query": [ { "key": "verifiedBy", "value": "6" } ] } }
+				},
+				{
+					"name": "PATCH /{id}/reject",
+					"request": { "method": "PATCH", "header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ], "url": { "raw": "{{baseUrl}}/api/kyc-records/2/reject", "host": [ "{{baseUrl}}" ], "path": [ "api", "kyc-records", "2", "reject" ] } }
+				}
+			]
+		},
+		{
+			"name": "AML Flags",
+			"item": [
+				{
+					"name": "POST raise flag (201)",
+					"request": {
+						"method": "POST",
+						"header": [ { "key": "Content-Type", "value": "application/json" }, { "key": "Authorization", "value": "Bearer {{token}}" } ],
+						"url": { "raw": "{{baseUrl}}/api/aml-flags", "host": [ "{{baseUrl}}" ], "path": [ "api", "aml-flags" ] },
+						"body": { "mode": "raw", "raw": "{\n  \"accountId\": 1,\n  \"transactionId\": 99,\n  \"flagType\": \"LargeTransaction\",\n  \"severity\": \"High\"\n}" }
+					}
+				},
+				{
+					"name": "GET ?accountId=1",
+					"request": { "method": "GET", "header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ], "url": { "raw": "{{baseUrl}}/api/aml-flags?accountId=1", "host": [ "{{baseUrl}}" ], "path": [ "api", "aml-flags" ], "query": [ { "key": "accountId", "value": "1" } ] } }
+				},
+				{
+					"name": "GET ?status=Open",
+					"request": { "method": "GET", "header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ], "url": { "raw": "{{baseUrl}}/api/aml-flags?status=Open", "host": [ "{{baseUrl}}" ], "path": [ "api", "aml-flags" ], "query": [ { "key": "status", "value": "Open" } ] } }
+				},
+				{
+					"name": "PATCH /{id}/investigate",
+					"request": { "method": "PATCH", "header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ], "url": { "raw": "{{baseUrl}}/api/aml-flags/1/investigate", "host": [ "{{baseUrl}}" ], "path": [ "api", "aml-flags", "1", "investigate" ] } }
+				},
+				{
+					"name": "PATCH /{id}/clear",
+					"request": { "method": "PATCH", "header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ], "url": { "raw": "{{baseUrl}}/api/aml-flags/1/clear", "host": [ "{{baseUrl}}" ], "path": [ "api", "aml-flags", "1", "clear" ] } }
+				}
+			]
+		}
+	]
+}

@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(mvn -v)",
+      "PowerShell($mvn = Get-Command mvn -ErrorAction SilentlyContinue; if \\($mvn\\) { \"mvn: $\\($mvn.Source\\)\" } else { \"no mvn on PATH\" }; $lombok = \"$env:USERPROFILE\\\\.m2\\\\repository\\\\org\\\\projectlombok\\\\lombok\"; if \\(Test-Path $lombok\\) { \"lombok cached:\"; Get-ChildItem $lombok | Select-Object -ExpandProperty Name } else { \"lombok NOT in local .m2\" })"
+    ]
+  }
+}

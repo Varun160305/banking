@@ -1,0 +1,3 @@
+package com.project.enums;
+
+public enum Role { ACCOUNTHOLDER, RELATIONSHIPMANAGER, LOANOFFICER, OPERATIONS, COMPLIANCE, ADMIN }

@@ -1,0 +1,125 @@
+{
+	"info": {
+		"name": "WealthWise - Investment & Portfolio + Banking Analytics (IPM/BAR)",
+		"description": "Modules 4.5 + 4.7 — Fixed Deposits, Portfolios (with nested Holdings), Banking Reports. Set {{baseUrl}} and {{token}} (from POST /api/auth/login; admin works for all).",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"variable": [
+		{ "key": "baseUrl", "value": "http://localhost:8098" },
+		{ "key": "token", "value": "" }
+	],
+	"item": [
+		{
+			"name": "Auth - Login (admin)",
+			"request": {
+				"method": "POST",
+				"header": [ { "key": "Content-Type", "value": "application/json" } ],
+				"url": { "raw": "{{baseUrl}}/api/auth/login", "host": [ "{{baseUrl}}" ], "path": [ "api", "auth", "login" ] },
+				"body": { "mode": "raw", "raw": "{\n  \"email\": \"admin@bank.com\",\n  \"password\": \"admin123\"\n}" }
+			}
+		},
+		{
+			"name": "Fixed Deposits",
+			"item": [
+				{
+					"name": "POST create FD (201)",
+					"request": {
+						"method": "POST",
+						"header": [ { "key": "Content-Type", "value": "application/json" }, { "key": "Authorization", "value": "Bearer {{token}}" } ],
+						"url": { "raw": "{{baseUrl}}/api/fixed-deposits", "host": [ "{{baseUrl}}" ], "path": [ "api", "fixed-deposits" ] },
+						"body": { "mode": "raw", "raw": "{\n  \"customerId\": 101,\n  \"accountId\": 1,\n  \"principal\": 100000,\n  \"interestRate\": 7.0,\n  \"tenure\": 12,\n  \"maturityDate\": \"2027-06-18\",\n  \"maturityAmount\": 107000\n}" }
+					}
+				},
+				{
+					"name": "GET ?customerId=101",
+					"request": { "method": "GET", "header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ], "url": { "raw": "{{baseUrl}}/api/fixed-deposits?customerId=101", "host": [ "{{baseUrl}}" ], "path": [ "api", "fixed-deposits" ], "query": [ { "key": "customerId", "value": "101" } ] } }
+				},
+				{
+					"name": "GET /{id} (200/404)",
+					"request": { "method": "GET", "header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ], "url": { "raw": "{{baseUrl}}/api/fixed-deposits/1", "host": [ "{{baseUrl}}" ], "path": [ "api", "fixed-deposits", "1" ] } }
+				},
+				{
+					"name": "PATCH /{id}/mature",
+					"request": { "method": "PATCH", "header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ], "url": { "raw": "{{baseUrl}}/api/fixed-deposits/1/mature", "host": [ "{{baseUrl}}" ], "path": [ "api", "fixed-deposits", "1", "mature" ] } }
+				},
+				{
+					"name": "PATCH /{id}/close-premature",
+					"request": { "method": "PATCH", "header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ], "url": { "raw": "{{baseUrl}}/api/fixed-deposits/2/close-premature", "host": [ "{{baseUrl}}" ], "path": [ "api", "fixed-deposits", "2", "close-premature" ] } }
+				},
+				{
+					"name": "GET /maturing?before=date",
+					"request": { "method": "GET", "header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ], "url": { "raw": "{{baseUrl}}/api/fixed-deposits/maturing?before=2027-01-01", "host": [ "{{baseUrl}}" ], "path": [ "api", "fixed-deposits", "maturing" ], "query": [ { "key": "before", "value": "2027-01-01" } ] } }
+				}
+			]
+		},
+		{
+			"name": "Portfolios (with nested Holdings)",
+			"item": [
+				{
+					"name": "POST create portfolio (201)",
+					"request": {
+						"method": "POST",
+						"header": [ { "key": "Content-Type", "value": "application/json" }, { "key": "Authorization", "value": "Bearer {{token}}" } ],
+						"url": { "raw": "{{baseUrl}}/api/portfolios", "host": [ "{{baseUrl}}" ], "path": [ "api", "portfolios" ] },
+						"body": { "mode": "raw", "raw": "{\n  \"customerId\": 105,\n  \"relationshipManagerId\": 3,\n  \"assetAllocation\": \"{\\\"Equity\\\":70,\\\"Debt\\\":30}\"\n}" }
+					}
+				},
+				{
+					"name": "GET ?customerId=101",
+					"request": { "method": "GET", "header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ], "url": { "raw": "{{baseUrl}}/api/portfolios?customerId=101", "host": [ "{{baseUrl}}" ], "path": [ "api", "portfolios" ], "query": [ { "key": "customerId", "value": "101" } ] } }
+				},
+				{
+					"name": "GET /{id} (200/404)",
+					"request": { "method": "GET", "header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ], "url": { "raw": "{{baseUrl}}/api/portfolios/1", "host": [ "{{baseUrl}}" ], "path": [ "api", "portfolios", "1" ] } }
+				},
+				{
+					"name": "POST /{id}/holdings - add FD holding (201)",
+					"request": {
+						"method": "POST",
+						"header": [ { "key": "Content-Type", "value": "application/json" }, { "key": "Authorization", "value": "Bearer {{token}}" } ],
+						"url": { "raw": "{{baseUrl}}/api/portfolios/1/holdings", "host": [ "{{baseUrl}}" ], "path": [ "api", "portfolios", "1", "holdings" ] },
+						"body": { "mode": "raw", "raw": "{\n  \"assetType\": \"FD\",\n  \"assetName\": \"WealthWise FD\",\n  \"units\": 1,\n  \"purchaseValue\": 100000,\n  \"currentValue\": 107000\n}" }
+					}
+				},
+				{
+					"name": "POST /{id}/holdings - add MutualFund holding (201)",
+					"request": {
+						"method": "POST",
+						"header": [ { "key": "Content-Type", "value": "application/json" }, { "key": "Authorization", "value": "Bearer {{token}}" } ],
+						"url": { "raw": "{{baseUrl}}/api/portfolios/1/holdings", "host": [ "{{baseUrl}}" ], "path": [ "api", "portfolios", "1", "holdings" ] },
+						"body": { "mode": "raw", "raw": "{\n  \"assetType\": \"MutualFund\",\n  \"assetName\": \"Index Fund\",\n  \"units\": 300,\n  \"purchaseValue\": 90000,\n  \"currentValue\": 96000\n}" }
+					}
+				},
+				{
+					"name": "GET /{id}/holdings",
+					"request": { "method": "GET", "header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ], "url": { "raw": "{{baseUrl}}/api/portfolios/1/holdings", "host": [ "{{baseUrl}}" ], "path": [ "api", "portfolios", "1", "holdings" ] } }
+				},
+				{
+					"name": "PATCH /{id}/holdings/{holdingId}/redeem",
+					"request": { "method": "PATCH", "header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ], "url": { "raw": "{{baseUrl}}/api/portfolios/1/holdings/1/redeem", "host": [ "{{baseUrl}}" ], "path": [ "api", "portfolios", "1", "holdings", "1", "redeem" ] } }
+				}
+			]
+		},
+		{
+			"name": "Banking Reports",
+			"item": [
+				{
+					"name": "POST generate ?scope= (201)",
+					"request": { "method": "POST", "header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ], "url": { "raw": "{{baseUrl}}/api/banking-reports?scope=Branch", "host": [ "{{baseUrl}}" ], "path": [ "api", "banking-reports" ], "query": [ { "key": "scope", "value": "Branch" } ] } }
+				},
+				{
+					"name": "GET (list)",
+					"request": { "method": "GET", "header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ], "url": { "raw": "{{baseUrl}}/api/banking-reports", "host": [ "{{baseUrl}}" ], "path": [ "api", "banking-reports" ] } }
+				},
+				{
+					"name": "GET /summary (flat JSON map)",
+					"request": { "method": "GET", "header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ], "url": { "raw": "{{baseUrl}}/api/banking-reports/summary", "host": [ "{{baseUrl}}" ], "path": [ "api", "banking-reports", "summary" ] } }
+				},
+				{
+					"name": "GET /{id}",
+					"request": { "method": "GET", "header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ], "url": { "raw": "{{baseUrl}}/api/banking-reports/1", "host": [ "{{baseUrl}}" ], "path": [ "api", "banking-reports", "1" ] } }
+				}
+			]
+		}
+	]
+}

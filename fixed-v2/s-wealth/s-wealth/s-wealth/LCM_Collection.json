@@ -1,0 +1,166 @@
+{
+	"info": {
+		"name": "WealthWise - Loan & Credit Management (LCM)",
+		"description": "Module 4.4 — Loan Applications, Loan Accounts, EMI Schedules. Set {{baseUrl}} and {{token}} (from POST /auth/login). Lifecycle: submit -> under-review -> approve -> disburse -> pay EMIs.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"variable": [
+		{ "key": "baseUrl", "value": "http://localhost:8098" },
+		{ "key": "token", "value": "" }
+	],
+	"item": [
+		{
+			"name": "Auth - Login (loan officer)",
+			"request": {
+				"method": "POST",
+				"header": [ { "key": "Content-Type", "value": "application/json" } ],
+				"url": { "raw": "{{baseUrl}}/api/auth/login", "host": [ "{{baseUrl}}" ], "path": [ "api", "auth", "login" ] },
+				"body": { "mode": "raw", "raw": "{\n  \"email\": \"loan@bank.com\",\n  \"password\": \"loan123\"\n}" }
+			}
+		},
+		{
+			"name": "Loan Applications",
+			"item": [
+				{
+					"name": "POST submit application (201)",
+					"request": {
+						"method": "POST",
+						"header": [ { "key": "Content-Type", "value": "application/json" }, { "key": "Authorization", "value": "Bearer {{token}}" } ],
+						"url": { "raw": "{{baseUrl}}/api/loan-applications", "host": [ "{{baseUrl}}" ], "path": [ "api", "loan-applications" ] },
+						"body": { "mode": "raw", "raw": "{\n  \"customerId\": 101,\n  \"loanType\": \"Vehicle\",\n  \"requestedAmount\": 600000,\n  \"tenure\": 6,\n  \"purpose\": \"Car purchase\"\n}" }
+					}
+				},
+				{
+					"name": "GET ?customerId=101",
+					"request": {
+						"method": "GET",
+						"header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ],
+						"url": { "raw": "{{baseUrl}}/api/loan-applications?customerId=101", "host": [ "{{baseUrl}}" ], "path": [ "api", "loan-applications" ], "query": [ { "key": "customerId", "value": "101" } ] }
+					}
+				},
+				{
+					"name": "GET ?status=Submitted",
+					"request": {
+						"method": "GET",
+						"header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ],
+						"url": { "raw": "{{baseUrl}}/api/loan-applications?status=Submitted", "host": [ "{{baseUrl}}" ], "path": [ "api", "loan-applications" ], "query": [ { "key": "status", "value": "Submitted" } ] }
+					}
+				},
+				{
+					"name": "GET /{id} (200/404)",
+					"request": {
+						"method": "GET",
+						"header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ],
+						"url": { "raw": "{{baseUrl}}/api/loan-applications/3", "host": [ "{{baseUrl}}" ], "path": [ "api", "loan-applications", "3" ] }
+					}
+				},
+				{
+					"name": "PATCH /{id}/under-review",
+					"request": {
+						"method": "PATCH",
+						"header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ],
+						"url": { "raw": "{{baseUrl}}/api/loan-applications/3/under-review", "host": [ "{{baseUrl}}" ], "path": [ "api", "loan-applications", "3", "under-review" ] }
+					}
+				},
+				{
+					"name": "PATCH /{id}/approve",
+					"request": {
+						"method": "PATCH",
+						"header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ],
+						"url": { "raw": "{{baseUrl}}/api/loan-applications/3/approve", "host": [ "{{baseUrl}}" ], "path": [ "api", "loan-applications", "3", "approve" ] }
+					}
+				},
+				{
+					"name": "PATCH /{id}/reject",
+					"request": {
+						"method": "PATCH",
+						"header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ],
+						"url": { "raw": "{{baseUrl}}/api/loan-applications/3/reject", "host": [ "{{baseUrl}}" ], "path": [ "api", "loan-applications", "3", "reject" ] }
+					}
+				}
+			]
+		},
+		{
+			"name": "Loan Accounts",
+			"item": [
+				{
+					"name": "POST /disburse?applicationId=3 (201, 400 if not APPROVED)",
+					"request": {
+						"method": "POST",
+						"header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ],
+						"url": { "raw": "{{baseUrl}}/api/loan-accounts/disburse?applicationId=3", "host": [ "{{baseUrl}}" ], "path": [ "api", "loan-accounts", "disburse" ], "query": [ { "key": "applicationId", "value": "3" } ] }
+					}
+				},
+				{
+					"name": "GET ?customerId=101",
+					"request": {
+						"method": "GET",
+						"header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ],
+						"url": { "raw": "{{baseUrl}}/api/loan-accounts?customerId=101", "host": [ "{{baseUrl}}" ], "path": [ "api", "loan-accounts" ], "query": [ { "key": "customerId", "value": "101" } ] }
+					}
+				},
+				{
+					"name": "GET /{id}",
+					"request": {
+						"method": "GET",
+						"header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ],
+						"url": { "raw": "{{baseUrl}}/api/loan-accounts/1", "host": [ "{{baseUrl}}" ], "path": [ "api", "loan-accounts", "1" ] }
+					}
+				},
+				{
+					"name": "PATCH /{id}/mark-npa",
+					"request": {
+						"method": "PATCH",
+						"header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ],
+						"url": { "raw": "{{baseUrl}}/api/loan-accounts/1/mark-npa", "host": [ "{{baseUrl}}" ], "path": [ "api", "loan-accounts", "1", "mark-npa" ] }
+					}
+				},
+				{
+					"name": "PATCH /{id}/close",
+					"request": {
+						"method": "PATCH",
+						"header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ],
+						"url": { "raw": "{{baseUrl}}/api/loan-accounts/1/close", "host": [ "{{baseUrl}}" ], "path": [ "api", "loan-accounts", "1", "close" ] }
+					}
+				}
+			]
+		},
+		{
+			"name": "EMI Schedules",
+			"item": [
+				{
+					"name": "GET ?loanAccountId=1",
+					"request": {
+						"method": "GET",
+						"header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ],
+						"url": { "raw": "{{baseUrl}}/api/emi-schedules?loanAccountId=1", "host": [ "{{baseUrl}}" ], "path": [ "api", "emi-schedules" ], "query": [ { "key": "loanAccountId", "value": "1" } ] }
+					}
+				},
+				{
+					"name": "GET /overdue",
+					"request": {
+						"method": "GET",
+						"header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ],
+						"url": { "raw": "{{baseUrl}}/api/emi-schedules/overdue", "host": [ "{{baseUrl}}" ], "path": [ "api", "emi-schedules", "overdue" ] }
+					}
+				},
+				{
+					"name": "PATCH /{id}/pay (200, 400 if already PAID)",
+					"request": {
+						"method": "PATCH",
+						"header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ],
+						"url": { "raw": "{{baseUrl}}/api/emi-schedules/1/pay", "host": [ "{{baseUrl}}" ], "path": [ "api", "emi-schedules", "1", "pay" ] }
+					}
+				},
+				{
+					"name": "GET /loan-account/{id}/summary",
+					"request": {
+						"method": "GET",
+						"header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ],
+						"url": { "raw": "{{baseUrl}}/api/emi-schedules/loan-account/1/summary", "host": [ "{{baseUrl}}" ], "path": [ "api", "emi-schedules", "loan-account", "1", "summary" ] }
+					}
+				}
+			]
+		}
+	]
+}

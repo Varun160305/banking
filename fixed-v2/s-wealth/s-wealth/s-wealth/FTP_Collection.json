@@ -1,0 +1,108 @@
+{
+	"info": {
+		"name": "WealthWise - Fund Transfers & Payments (FTP)",
+		"description": "Module 4.3 — Fund Transfers, Beneficiaries, Scheduled Payments. Set {{baseUrl}} and {{token}} (from POST /api/auth/login).",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"variable": [
+		{ "key": "baseUrl", "value": "http://localhost:8098" },
+		{ "key": "token", "value": "" }
+	],
+	"item": [
+		{
+			"name": "Auth - Login (get token)",
+			"request": {
+				"method": "POST",
+				"header": [ { "key": "Content-Type", "value": "application/json" } ],
+				"url": { "raw": "{{baseUrl}}/api/auth/login", "host": [ "{{baseUrl}}" ], "path": [ "api", "auth", "login" ] },
+				"body": { "mode": "raw", "raw": "{\n  \"email\": \"holder@bank.com\",\n  \"password\": \"holder123\"\n}" }
+			}
+		},
+		{
+			"name": "Fund Transfers",
+			"item": [
+				{
+					"name": "POST initiate transfer (201)",
+					"request": {
+						"method": "POST",
+						"header": [ { "key": "Content-Type", "value": "application/json" }, { "key": "Authorization", "value": "Bearer {{token}}" } ],
+						"url": { "raw": "{{baseUrl}}/api/fund-transfers", "host": [ "{{baseUrl}}" ], "path": [ "api", "fund-transfers" ] },
+						"body": { "mode": "raw", "raw": "{\n  \"fromAccountId\": 1,\n  \"toAccountId\": 2,\n  \"amount\": 1500.00,\n  \"transferType\": \"Internal\"\n}" }
+					}
+				},
+				{
+					"name": "GET by fromAccountId",
+					"request": { "method": "GET", "header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ], "url": { "raw": "{{baseUrl}}/api/fund-transfers?fromAccountId=1", "host": [ "{{baseUrl}}" ], "path": [ "api", "fund-transfers" ], "query": [ { "key": "fromAccountId", "value": "1" } ] } }
+				},
+				{
+					"name": "GET by toAccountId",
+					"request": { "method": "GET", "header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ], "url": { "raw": "{{baseUrl}}/api/fund-transfers?toAccountId=2", "host": [ "{{baseUrl}}" ], "path": [ "api", "fund-transfers" ], "query": [ { "key": "toAccountId", "value": "2" } ] } }
+				},
+				{
+					"name": "GET by id (200/404)",
+					"request": { "method": "GET", "header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ], "url": { "raw": "{{baseUrl}}/api/fund-transfers/1", "host": [ "{{baseUrl}}" ], "path": [ "api", "fund-transfers", "1" ] } }
+				},
+				{
+					"name": "PATCH reverse (200/400)",
+					"request": { "method": "PATCH", "header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ], "url": { "raw": "{{baseUrl}}/api/fund-transfers/1/reverse", "host": [ "{{baseUrl}}" ], "path": [ "api", "fund-transfers", "1", "reverse" ] } }
+				},
+				{
+					"name": "GET account statement (date range)",
+					"request": { "method": "GET", "header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ], "url": { "raw": "{{baseUrl}}/api/fund-transfers/account/1/statement?from=2025-06-01&to=2025-06-30", "host": [ "{{baseUrl}}" ], "path": [ "api", "fund-transfers", "account", "1", "statement" ], "query": [ { "key": "from", "value": "2025-06-01" }, { "key": "to", "value": "2025-06-30" } ] } }
+				}
+			]
+		},
+		{
+			"name": "Beneficiaries",
+			"item": [
+				{
+					"name": "POST add beneficiary (201)",
+					"request": {
+						"method": "POST",
+						"header": [ { "key": "Content-Type", "value": "application/json" }, { "key": "Authorization", "value": "Bearer {{token}}" } ],
+						"url": { "raw": "{{baseUrl}}/api/beneficiaries", "host": [ "{{baseUrl}}" ], "path": [ "api", "beneficiaries" ] },
+						"body": { "mode": "raw", "raw": "{\n  \"customerId\": 101,\n  \"accountNumber\": \"SB9000900009\",\n  \"name\": \"Asha Verma\",\n  \"bankName\": \"WealthWise Bank\"\n}" }
+					}
+				},
+				{
+					"name": "GET by customerId (only ACTIVE)",
+					"request": { "method": "GET", "header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ], "url": { "raw": "{{baseUrl}}/api/beneficiaries?customerId=101", "host": [ "{{baseUrl}}" ], "path": [ "api", "beneficiaries" ], "query": [ { "key": "customerId", "value": "101" } ] } }
+				},
+				{
+					"name": "GET by id (200/404)",
+					"request": { "method": "GET", "header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ], "url": { "raw": "{{baseUrl}}/api/beneficiaries/1", "host": [ "{{baseUrl}}" ], "path": [ "api", "beneficiaries", "1" ] } }
+				},
+				{
+					"name": "DELETE soft delete (204)",
+					"request": { "method": "DELETE", "header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ], "url": { "raw": "{{baseUrl}}/api/beneficiaries/1", "host": [ "{{baseUrl}}" ], "path": [ "api", "beneficiaries", "1" ] } }
+				}
+			]
+		},
+		{
+			"name": "Scheduled Payments",
+			"item": [
+				{
+					"name": "POST create schedule (201)",
+					"request": {
+						"method": "POST",
+						"header": [ { "key": "Content-Type", "value": "application/json" }, { "key": "Authorization", "value": "Bearer {{token}}" } ],
+						"url": { "raw": "{{baseUrl}}/api/scheduled-payments", "host": [ "{{baseUrl}}" ], "path": [ "api", "scheduled-payments" ] },
+						"body": { "mode": "raw", "raw": "{\n  \"customerId\": 101,\n  \"fromAccountId\": 1,\n  \"beneficiaryId\": 1,\n  \"amount\": 1000.00,\n  \"frequency\": \"Monthly\",\n  \"nextRunDate\": \"2025-08-01\"\n}" }
+					}
+				},
+				{
+					"name": "GET by customerId",
+					"request": { "method": "GET", "header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ], "url": { "raw": "{{baseUrl}}/api/scheduled-payments?customerId=101", "host": [ "{{baseUrl}}" ], "path": [ "api", "scheduled-payments" ], "query": [ { "key": "customerId", "value": "101" } ] } }
+				},
+				{
+					"name": "PATCH pause",
+					"request": { "method": "PATCH", "header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ], "url": { "raw": "{{baseUrl}}/api/scheduled-payments/1/pause", "host": [ "{{baseUrl}}" ], "path": [ "api", "scheduled-payments", "1", "pause" ] } }
+				},
+				{
+					"name": "PATCH cancel",
+					"request": { "method": "PATCH", "header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ], "url": { "raw": "{{baseUrl}}/api/scheduled-payments/1/cancel", "host": [ "{{baseUrl}}" ], "path": [ "api", "scheduled-payments", "1", "cancel" ] } }
+				}
+			]
+		}
+	]
+}

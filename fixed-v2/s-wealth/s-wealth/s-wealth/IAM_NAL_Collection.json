@@ -1,0 +1,121 @@
+{
+	"info": {
+		"name": "WealthWise - IAM + Notifications & Alerts (IAM/NAL)",
+		"description": "Modules 4.1 + 4.8 — Auth (JWT), Users, Audit Logs, Notifications. Set {{baseUrl}} and {{token}} (from POST /api/auth/login, which returns {token,role,userId}).",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"variable": [
+		{ "key": "baseUrl", "value": "http://localhost:8098" },
+		{ "key": "token", "value": "" }
+	],
+	"item": [
+		{
+			"name": "Auth",
+			"item": [
+				{
+					"name": "POST /api/auth/login -> {token,role,userId} or 401",
+					"request": {
+						"method": "POST",
+						"header": [ { "key": "Content-Type", "value": "application/json" } ],
+						"url": { "raw": "{{baseUrl}}/api/auth/login", "host": [ "{{baseUrl}}" ], "path": [ "api", "auth", "login" ] },
+						"body": { "mode": "raw", "raw": "{\n  \"email\": \"admin@bank.com\",\n  \"password\": \"admin123\"\n}" }
+					}
+				}
+			]
+		},
+		{
+			"name": "Users (ADMIN token required)",
+			"item": [
+				{
+					"name": "POST /api/users (201)",
+					"request": {
+						"method": "POST",
+						"header": [ { "key": "Content-Type", "value": "application/json" }, { "key": "Authorization", "value": "Bearer {{token}}" } ],
+						"url": { "raw": "{{baseUrl}}/api/users", "host": [ "{{baseUrl}}" ], "path": [ "api", "users" ] },
+						"body": { "mode": "raw", "raw": "{\n  \"name\": \"New Teller\",\n  \"email\": \"teller@bank.com\",\n  \"role\": \"OPERATIONS\",\n  \"phone\": \"9000000099\",\n  \"branchId\": 1,\n  \"password\": \"teller123\"\n}" }
+					}
+				},
+				{
+					"name": "GET /api/users (list)",
+					"request": { "method": "GET", "header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ], "url": { "raw": "{{baseUrl}}/api/users", "host": [ "{{baseUrl}}" ], "path": [ "api", "users" ] } }
+				},
+				{
+					"name": "GET /api/users/{id} (200/404)",
+					"request": { "method": "GET", "header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ], "url": { "raw": "{{baseUrl}}/api/users/1", "host": [ "{{baseUrl}}" ], "path": [ "api", "users", "1" ] } }
+				},
+				{
+					"name": "PATCH /api/users/{id}/status?status=Inactive",
+					"request": { "method": "PATCH", "header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ], "url": { "raw": "{{baseUrl}}/api/users/2/status?status=Inactive", "host": [ "{{baseUrl}}" ], "path": [ "api", "users", "2", "status" ], "query": [ { "key": "status", "value": "Inactive" } ] } }
+				},
+				{
+					"name": "PATCH /api/users/{id}/lock",
+					"request": { "method": "PATCH", "header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ], "url": { "raw": "{{baseUrl}}/api/users/2/lock", "host": [ "{{baseUrl}}" ], "path": [ "api", "users", "2", "lock" ] } }
+				},
+				{
+					"name": "PATCH /api/users/{id}/unlock",
+					"request": { "method": "PATCH", "header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ], "url": { "raw": "{{baseUrl}}/api/users/2/unlock", "host": [ "{{baseUrl}}" ], "path": [ "api", "users", "2", "unlock" ] } }
+				}
+			]
+		},
+		{
+			"name": "Audit Logs",
+			"item": [
+				{
+					"name": "POST /api/audit-logs (internal, public)",
+					"request": {
+						"method": "POST",
+						"header": [ { "key": "Content-Type", "value": "application/json" } ],
+						"url": { "raw": "{{baseUrl}}/api/audit-logs", "host": [ "{{baseUrl}}" ], "path": [ "api", "audit-logs" ] },
+						"body": { "mode": "raw", "raw": "{\n  \"userId\": 1,\n  \"action\": \"LOGIN\",\n  \"module\": \"USER_MODULE\",\n  \"ipAddress\": \"127.0.0.1\",\n  \"entityId\": 1\n}" }
+					}
+				},
+				{
+					"name": "GET /api/audit-logs (pageable, ADMIN)",
+					"request": { "method": "GET", "header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ], "url": { "raw": "{{baseUrl}}/api/audit-logs?page=0&size=10", "host": [ "{{baseUrl}}" ], "path": [ "api", "audit-logs" ], "query": [ { "key": "page", "value": "0" }, { "key": "size", "value": "10" } ] } }
+				},
+				{
+					"name": "GET /api/audit-logs?userId=1",
+					"request": { "method": "GET", "header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ], "url": { "raw": "{{baseUrl}}/api/audit-logs?userId=1", "host": [ "{{baseUrl}}" ], "path": [ "api", "audit-logs" ], "query": [ { "key": "userId", "value": "1" } ] } }
+				},
+				{
+					"name": "GET /api/audit-logs?module=USER_MODULE",
+					"request": { "method": "GET", "header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ], "url": { "raw": "{{baseUrl}}/api/audit-logs?module=USER_MODULE", "host": [ "{{baseUrl}}" ], "path": [ "api", "audit-logs" ], "query": [ { "key": "module", "value": "USER_MODULE" } ] } }
+				}
+			]
+		},
+		{
+			"name": "Notifications",
+			"item": [
+				{
+					"name": "POST /api/notifications (201)",
+					"request": {
+						"method": "POST",
+						"header": [ { "key": "Content-Type", "value": "application/json" }, { "key": "Authorization", "value": "Bearer {{token}}" } ],
+						"url": { "raw": "{{baseUrl}}/api/notifications", "host": [ "{{baseUrl}}" ], "path": [ "api", "notifications" ] },
+						"body": { "mode": "raw", "raw": "{\n  \"userId\": 2,\n  \"message\": \"Welcome to WealthWise\",\n  \"category\": \"Transaction\"\n}" }
+					}
+				},
+				{
+					"name": "GET /api/notifications/user/{userId}",
+					"request": { "method": "GET", "header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ], "url": { "raw": "{{baseUrl}}/api/notifications/user/2", "host": [ "{{baseUrl}}" ], "path": [ "api", "notifications", "user", "2" ] } }
+				},
+				{
+					"name": "GET /api/notifications/user/{userId}/unread",
+					"request": { "method": "GET", "header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ], "url": { "raw": "{{baseUrl}}/api/notifications/user/2/unread", "host": [ "{{baseUrl}}" ], "path": [ "api", "notifications", "user", "2", "unread" ] } }
+				},
+				{
+					"name": "GET /api/notifications/user/{userId}/count -> {unreadCount:N}",
+					"request": { "method": "GET", "header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ], "url": { "raw": "{{baseUrl}}/api/notifications/user/2/count", "host": [ "{{baseUrl}}" ], "path": [ "api", "notifications", "user", "2", "count" ] } }
+				},
+				{
+					"name": "PATCH /api/notifications/{id}/read",
+					"request": { "method": "PATCH", "header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ], "url": { "raw": "{{baseUrl}}/api/notifications/1/read", "host": [ "{{baseUrl}}" ], "path": [ "api", "notifications", "1", "read" ] } }
+				},
+				{
+					"name": "PATCH /api/notifications/user/{userId}/read-all -> {updated:N}",
+					"request": { "method": "PATCH", "header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ], "url": { "raw": "{{baseUrl}}/api/notifications/user/2/read-all", "host": [ "{{baseUrl}}" ], "path": [ "api", "notifications", "user", "2", "read-all" ] } }
+				}
+			]
+		}
+	]
+}
