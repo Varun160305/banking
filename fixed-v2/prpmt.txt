@@ -1,0 +1,76 @@
+I have a Spring Boot banking application with a Beneficiary module. I want to refactor and enhance it to follow production-level best practices.
+
+Here is my current setup:
+- Entity uses Integer customerId instead of relationship
+- Basic service and controller exist
+- Simple exception handling
+
+Please update and provide full improved code for:
+1. Entity
+2. Repository
+3. Service Implementation
+4. Controller
+5. DTO (if needed improvements)
+
+✅ REQUIREMENTS:
+
+1. ✅ Convert customerId to proper foreign key:
+   Use:
+   @ManyToOne
+   @JoinColumn(name = "customer_id")
+   private User customer;
+
+2. ✅ Keep accountNumber as String (NOT foreign key)
+
+3. ✅ Update repository methods:
+   Replace:
+   findByCustomerId(Integer customerId)
+   WITH:
+   findByCustomer(User customer)
+
+4. ✅ Update service layer:
+   - Replace customerId usage with User entity
+   - Extract logged-in user using SecurityContextHolder
+   - Ensure users can only manage their own beneficiaries
+   - Prevent duplicate beneficiaries using exists check
+   - Add proper validation (null checks, input validation)
+
+5. ✅ Add proper exception handling:
+   - Use meaningful error messages
+   - Optionally create custom exception class (like ResourceNotFoundException)
+   - Avoid using .orElse(null), use .orElseThrow()
+
+6. ✅ Improve controller:
+   - Add try-catch blocks
+   - Return proper HTTP status codes:
+     200 OK
+     201 CREATED
+     400 BAD REQUEST
+     404 NOT FOUND
+     409 CONFLICT
+   - Prevent user from accessing other users' beneficiaries (security check)
+
+7. ✅ Add soft delete:
+   - Instead of deleting, set status = DELETED
+
+8. ✅ Improve DTO mapping:
+   - Convert User → customerId in DTO
+   - Do not expose full User object in API
+
+9. ✅ Add logging using log.info()
+
+10. ✅ Optional (advanced):
+   - Add @RestControllerAdvice for global exception handling
+   - Validate request input properly
+
+✅ EXPECTED OUTPUT:
+- Full working code for:
+  - Beneficiary Entity (with @ManyToOne)
+  - BeneficiaryRepository
+  - BeneficiaryServiceImplementation
+  - BeneficiaryController
+  - DTO updates if needed
+
+- Code should be clean, production-ready, and interview-level.
+
+- Follow best practices for Spring Boot + JPA + Security
